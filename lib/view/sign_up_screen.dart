@@ -1,17 +1,18 @@
-import 'package:ecommerce_app/controllers/auth_controller.dart';
 import 'package:ecommerce_app/utils/app_textStyles.dart';
-import 'package:ecommerce_app/view/forget_password_screen.dart';
 import 'package:ecommerce_app/view/main_screen.dart';
-import 'package:ecommerce_app/view/sign_up_screen.dart';
+import 'package:ecommerce_app/view/signin_screen.dart';
 import 'package:ecommerce_app/view/widgets/custom_textField.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SignInScreen extends StatelessWidget {
-  SignInScreen({super.key});
+class SignUpScreen extends StatelessWidget {
+  SignUpScreen({super.key});
 
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -24,23 +25,53 @@ class SignInScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 40),
+              // back button
+              IconButton(
+                onPressed: () => Get.back(),
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+
+              const SizedBox(height: 20),
               Text(
-                'Welcome Back!',
+                'Create Account',
                 style: AppTextStyle.withColor(
                   AppTextStyle.h1,
                   Theme.of(context).textTheme.bodyLarge!.color!,
                 ),
               ),
+
               const SizedBox(height: 8),
               Text(
-                'Sign in to continue shopping',
+                'Signup to get started',
                 style: AppTextStyle.withColor(
                   AppTextStyle.bodyLarge,
                   isDark ? Colors.grey[400]! : Colors.grey[600]!,
                 ),
               ),
+
               const SizedBox(height: 40),
+
+              //full name textField
+              CustomTextField(
+                label: 'Full Name',
+                prefixIcon: Icons.person_2_outlined,
+                keyboardType: TextInputType.name,
+                controller: _nameController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your full-name';
+                  }
+                  if (!GetUtils.isUsername(value)) {
+                    return 'Please enter a valid full-name';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
 
               // email TextField
               CustomTextField(
@@ -78,27 +109,31 @@ class SignInScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Forget-Password TextField
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Get.to(() => ForgetPasswordScreen()),
-                  child: Text(
-                    'Forget Password?',
-                    style: AppTextStyle.withColor(
-                      AppTextStyle.buttonMedium,
-                      Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ),
+              // Confirm password textField
+              CustomTextField(
+                label: 'Confirm Password',
+                prefixIcon: Icons.lock_outline,
+                keyboardType: TextInputType.visiblePassword,
+                isPassword: true,
+                controller: _confirmPasswordController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your Confirm password';
+                  }
+                  if (value != _passwordController.text) {
+                    return "Password do not match";
+                  }
+                  return null;
+                },
               ),
+
               const SizedBox(height: 24),
 
-              // Sign In button
+              // Signup button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _handleSignIn,
+                  onPressed: () => Get.off(() => const MainScreen()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -107,7 +142,7 @@ class SignInScreen extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    "Sign In",
+                    'Sign Up',
                     style: AppTextStyle.withColor(
                       AppTextStyle.buttonMedium,
                       Colors.white,
@@ -117,21 +152,22 @@ class SignInScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
-              //signup textButton
+
+              // signIn text
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account?",
+                    "Already have an account? ",
                     style: AppTextStyle.withColor(
-                      AppTextStyle.buttonMedium,
+                      AppTextStyle.bodyMedium,
                       isDark ? Colors.grey[400]! : Colors.grey[600]!,
                     ),
                   ),
                   TextButton(
-                    onPressed: () => Get.to(() => SignUpScreen()),
+                    onPressed: () => SignInScreen(),
                     child: Text(
-                      "Sign Up",
+                      "Sign In",
                       style: AppTextStyle.withColor(
                         AppTextStyle.buttonMedium,
                         Theme.of(context).primaryColor,
@@ -145,12 +181,5 @@ class SignInScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  //sign in button onPressed
-  void _handleSignIn() {
-    final AuthController authController = Get.find<AuthController>();
-    authController.login();
-    Get.offAll(() => const MainScreen());
   }
 }
